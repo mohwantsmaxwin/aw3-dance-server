@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, request
 from collections import deque
+import os
 
 app = Flask(__name__)
 queue = deque()
 
 @app.route('/spawn', methods=['POST'])
 def spawn():
-    data = request.json
-    username = data.get('username','').strip()
+    data = request.get_json(force=True)
+    username = data.get('username', '').strip()
     if username:
         queue.append(username)
     return jsonify({'ok': True})
@@ -19,4 +20,5 @@ def poll():
     return jsonify({'username': None})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
